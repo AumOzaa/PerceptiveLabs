@@ -1,20 +1,30 @@
 from parser import parse_directory
+import json
 
 
 results = parse_directory("./perceptive")
 
-print(f"\nParsed {len(results)} PDFs")
+output = []
 
 for document in results:
-    print(f"\n--- {document['filename']} ---")
+    content = []
 
     for page in document["pages"]:
-        print(f"\nPage {page['page_number']}")
+        content.append(f"Page {page['page_number']}")
 
-        print("Text:")
-        print(page["text"])
+        content.append("Text:")
+        content.append(page["text"])
 
-        print(f"Tables found: {len(page['tables'])}")
+        content.append(f"Tables found: {len(page['tables'])}")
 
         for table in page["tables"]:
-            print(table["rows"])
+            content.append(str(table["rows"]))
+
+    output.append({
+        "filename": document["filename"],
+        "content": "\n".join(content)
+    })
+
+
+with open("parsed_output.json", "w", encoding="utf-8") as file:
+    json.dump(output, file, indent=2, ensure_ascii=False)
